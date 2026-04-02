@@ -1,8 +1,26 @@
 ---
-#---------------------------------------------------------
-# - Create a semantical release
-# - Merge main into next, alpha, beta, and next-major
-#---------------------------------------------------------
+###############################################################################
+# Workflow: Push to main
+#
+# Purpose:
+#   - Automates semantic release creation on pushes to the main branch.
+#   - Merges main into next, alpha, beta, and next-major branches to keep them up to date.
+#
+# Triggers:
+#   - On push to the main branch
+#   - Manual dispatch
+#
+# Key Steps:
+#   1. Checkout repository code
+#   2. Merge main into next, next-major, alpha, and beta branches using a custom action
+#   3. Run semantic-release to publish new versions and changelogs
+#   4. Push updates to the appropriate major version branch if a new release is published
+#
+# Notes:
+#   - Uses a custom merge-branch action for branch synchronization
+#   - Requires PAT (Personal Access Token) secret for authentication
+#   - Integrates with cycjimmy/semantic-release-action for automated releases
+###############################################################################
 name: Push to main
 
 on:

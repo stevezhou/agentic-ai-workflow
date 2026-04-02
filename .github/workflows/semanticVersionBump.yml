@@ -1,13 +1,30 @@
 ---
-#------------------------------------------------------------------------------
-# Lawrence McDaniel - https://lawrencemcdaniel.com
-# Version Bump Workflow for Python package openai_utils
+###############################################################################
+# Workflow: Semantic Version Bump (next)
 #
-# Calculate the version of the 'next' branch based on semantic-release rules.
-# Compares the existing value of __version__.py to the calculated value.
-# If they are different, it will update __version__.py and push the changes
-# to the main branch.
-#------------------------------------------------------------------------------
+# Purpose:
+#   - Calculates the next semantic version for the Python package (openai_utils)
+#     based on semantic-release rules, comparing the current __version__.py value
+#     to the calculated value.
+#   - If a version bump is needed, updates __version__.py and pushes the change
+#     to the main branch.
+#
+# Triggers:
+#   - On push to the main branch
+#   - Manual dispatch
+#
+# Key Steps:
+#   1. Checkout repository code
+#   2. Set up Python and Node.js environments
+#   3. Get current and next semantic version values
+#   4. Compare versions and update __version__.py if needed
+#   5. Commit and push the updated version file to the repository
+#
+# Notes:
+#   - Uses semantic-release (dry-run) to determine the next version
+#   - Requires PAT (Personal Access Token) secret for authentication
+#   - Only updates __version__.py if a version bump is detected
+###############################################################################
 name: Semantic Version Bump (next)
 
 on:
