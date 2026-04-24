@@ -66,9 +66,15 @@ jobs:
   # This job will run after the Python unit tests and
   # is scaffolded to facilitate sending notifications based
   # on the test results.
+  #
+  #MAIL_USERNAMEyour sender Gmail address (or SMTP user)
+  #MAIL_PASSWORDGmail App Password (not your account password)
+  #NOTIFY_EMAIL the recipient address(es), comma-separated
+
   notifications:
     needs: python-unit-tests
     runs-on: ubuntu-latest
+    if: always()   # run even when python-unit-tests fails
     steps:
       - name: Notify on test results
         run: |
@@ -77,3 +83,24 @@ jobs:
           else
             echo "failure notifications go here"
           fi
+      #Steve Zhou Added email notification for test failures using dawidd6/action-send-mail
+      - name: Send failure email
+        if: needs.python-unit-tests.result != 'success'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com      # ← swap for your SMTP host
+          server_port: 465
+          secure: true
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: "❌ Python Unit Tests FAILED — ${{ github.repository }} (${{ github.ref_name }})"
+          to: ${{ secrets.NOTIFY_EMAIL }}
+          from: "GitHub Actions <${{ secrets.MAIL_USERNAME }}>"
+          body: |
+            The Python Unit Tests workflow failed.
+
+            Repository : ${{ github.repository }}
+            Branch     : ${{ github.ref_name }}
+            Commit     : ${{ github.sha }}
+            Triggered by: ${{ github.actor }}
+            Run URL    : https://github.com/${{ github.repository }}/actions/run/${{ github.run_id }}
