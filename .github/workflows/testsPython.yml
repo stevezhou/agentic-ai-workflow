@@ -78,29 +78,15 @@ jobs:
     steps:
       - name: Notify on test results
         run: |
-          if [ "${{ needs.python-unit-tests.result }}" == "success" ]; then
-            echo "success notifications go here"
-          else
-            echo "failure notifications go here"
+         if [ "${{ needs.python-unit-tests.result }}" != "success" ]; then
+            printf "Python unit tests failed in GitHub Actions\n\nRepository: %s\nBranch: %s\nWorkflow: %s\nRun ID: %s\nCommit: %s\n\nDetails:\nhttps://github.com/%s/actions/runs/%s\n" \
+              "${{ github.repository }}" \
+              "${{ github.ref_name }}" \
+              "${{ github.workflow }}" \
+              "${{ github.run_id }}" \
+              "${{ github.sha }}" \
+              "${{ github.repository }}" \
+              "${{ github.run_id }}" \
+            | mail -s "GitHub Unit Test Failed - ${{ github.repository }}" "${{ secrets.GITHUB_EMAIL }}"
           fi
-      #Steve Zhou Added email notification for test failures using dawidd6/action-send-mail
-      - name: Send failure email
-        if: needs.python-unit-tests.result != 'success'
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com      # ← swap for your SMTP host
-          server_port: 465
-          secure: true
-          username: ${{ secrets.MAIL_USERNAME }}
-          password: ${{ secrets.MAIL_PASSWORD }}
-          subject: "❌ Python Unit Tests FAILED — ${{ github.repository }} (${{ github.ref_name }})"
-          to: ${{ secrets.NOTIFY_EMAIL }}
-          from: "GitHub Actions <${{ secrets.MAIL_USERNAME }}>"
-          body: |
-            The Python Unit Tests workflow failed.
-
-            Repository : ${{ github.repository }}
-            Branch     : ${{ github.ref_name }}
-            Commit     : ${{ github.sha }}
-            Triggered by: ${{ github.actor }}
-            Run URL    : https://github.com/${{ github.repository }}/actions/run/${{ github.run_id }}
+      
