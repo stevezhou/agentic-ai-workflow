@@ -76,14 +76,32 @@ jobs:
     runs-on: ubuntu-latest
     if: always()   # run even when python-unit-tests fails
     steps:
-      - name: Notify on test results
-      - name: Report failed tests
-        if: ${{ needs.python-unit-tests.result == 'failure' }}
-        run: |
-          echo "::warning title=XPython Unit Tests Failed::Review the python-unit-tests job logs for details."
-          echo "### XPython Unit Tests Failed" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Job: python-unit-tests" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Branch/ref: ${{ github.ref }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Triggered by: @${{ github.actor }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> "$GITHUB_STEP_SUMMARY"
+       - name: Notify on test results
+
+            if [ "${{ needs.python-unit-tests.result }}" == "success" ]
+            run: |
+              echo "success notifications go here"
+           
+            
+            if: ${{ needs.python-unit-tests.result == 'failure' }}
+            run: |
+              echo "failure notifications go here"
+              uses: dawidd6/action-send-mail@v3
+              with:
+                server_address: smtp.gmail.com     
+                server_port: 465
+                secure: true
+                username: ${{ secrets.MAIL_USERNAME }}
+                password: ${{ secrets.MAIL_PASSWORD }}
+                subject: "❌ Python Unit Tests FAILED — ${{ github.repository }} (${{ github.ref_name }})"
+                to: ${{ secrets.NOTIFY_EMAIL }}
+                from: "GitHub Actions <${{ secrets.MAIL_USERNAME }}>"
+                body: |
+                  The Python Unit Tests workflow failed.
+                  Repository : ${{ github.repository }}
+                  Branch     : ${{ github.ref_name }}
+                  Commit     : ${{ github.sha }}
+                  Triggered by: ${{ github.actor }}
+                  Run URL    : https://github.com/${{ github.repository }}/actions/run/${{ github.run_id }}
+
+       
