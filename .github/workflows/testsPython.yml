@@ -77,16 +77,13 @@ jobs:
     if: always()   # run even when python-unit-tests fails
     steps:
       - name: Notify on test results
+      - name: Report failed tests
+        if: ${{ needs.python-unit-tests.result == 'failure' }}
         run: |
-         if [ "${{ needs.python-unit-tests.result }}" != "success" ]; then
-            printf "Python unit tests failed in GitHub Actions\n\nRepository: %s\nBranch: %s\nWorkflow: %s\nRun ID: %s\nCommit: %s\n\nDetails:\nhttps://github.com/%s/actions/runs/%s\n" \
-              "${{ github.repository }}" \
-              "${{ github.ref_name }}" \
-              "${{ github.workflow }}" \
-              "${{ github.run_id }}" \
-              "${{ github.sha }}" \
-              "${{ github.repository }}" \
-              "${{ github.run_id }}" \
-            | mail -s "GitHub Unit Test Failed - ${{ github.repository }}" "${{ secrets.GITHUB_EMAIL }}"
-          fi
-      
+          echo "::warning title=XPython Unit Tests Failed::Review the python-unit-tests job logs for details."
+          echo "### XPython Unit Tests Failed" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Job: python-unit-tests" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Branch/ref: ${{ github.ref }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Triggered by: @${{ github.actor }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> "$GITHUB_STEP_SUMMARY"
